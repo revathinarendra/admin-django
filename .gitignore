@@ -1,0 +1,5 @@
+.env
+env-admin
+.vercel
+__pycache__
+

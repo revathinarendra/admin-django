@@ -1,0 +1,14 @@
+Django
+dotenv
+decorator
+djangorestframework
+django-cors-headers
+djangorestframework-simplejwt
+pillow
+psycopg2-binary
+setuptools
+requests
+asgiref
+awscrt
+charset-normalizer
+colorama
