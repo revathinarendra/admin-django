@@ -11,6 +11,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('admin/', admin.site.urls),
     path('api/', include('accounts.urls')),
+    path('api/', include('products.urls')),
 
     # JWT Token routes
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

@@ -29,6 +29,7 @@ THIRD_PARTY_APPS = [
 ]
 OUR_APPS = [
     'accounts',
+    'products',
    
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + OUR_APPS
@@ -62,6 +63,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'adminpanel.wsgi.application'
+AUTH_USER_MODEL = 'accounts.Account'
 
 
 # Database

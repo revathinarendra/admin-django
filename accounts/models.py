@@ -1,9 +1,24 @@
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 import uuid
 
-# Create your models here.
+
+class Account(AbstractUser):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, blank=True, null=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']  # Optional depending on your logic
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        swappable = 'AUTH_USER_MODEL'  # Allows Django to recognize this as a swappable custom user model
+
+
 class UserProfile(models.Model):
     GENDER_CHOICES = [
         ('male', 'Male'),
@@ -11,22 +26,23 @@ class UserProfile(models.Model):
         ('other', 'Other'),
     ]
 
-    user = models.OneToOneField(User, related_name='userprofile', on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='userprofile', on_delete=models.CASCADE)
     date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True)
     address_line_1 = models.CharField(blank=True, max_length=100)
     address_line_2 = models.CharField(blank=True, max_length=100)
-    profile_picture = models.ImageField(upload_to="userprofile", blank=True)
-    phone_number = models.CharField(blank=True,max_length=15)
+    profile_picture = models.ImageField(upload_to="userprofile", blank=True, null=True)
+    phone_number = models.CharField(blank=True, max_length=15)
     city = models.CharField(blank=True, max_length=20)
     state = models.CharField(blank=True, max_length=20)
     country = models.CharField(blank=True, max_length=20)
 
     def __str__(self):
-        return self.user.first_name
-    
+        return self.user.email  # Safer than first_name
+
+
 class EmailVerificationToken(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     token = models.UUIDField(default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -38,7 +54,3 @@ class EmailVerificationToken(models.Model):
         self.token = uuid.uuid4()
         self.created_at = timezone.now()
         self.save()
-
-
-
-
