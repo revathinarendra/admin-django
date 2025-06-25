@@ -74,12 +74,32 @@ class CartItemListCreateView(APIView):
         serializer = CartItemSerializer(cart_items, many=True)
         return Response(serializer.data)
 
+    # def post(self, request):
+    #     serializer = CartItemSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save(user=request.user)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def post(self, request):
-        serializer = CartItemSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        item_id = request.data.get('item')
+        quantity = request.data.get('quantity', 1)
+
+        if not item_id:
+            return Response({"error": "Item ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_item, created = CartItem.objects.get_or_create(
+            user=request.user,
+            item_id=item_id,
+            defaults={'quantity': quantity}
+        )
+
+        if not created:
+            # If already exists, update the quantity
+            cart_item.quantity = quantity
+            cart_item.save()
+
+        serializer = CartItemSerializer(cart_item)
+        return Response(serializer.data, status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED)
 
 
 class CartItemDetailView(APIView):
